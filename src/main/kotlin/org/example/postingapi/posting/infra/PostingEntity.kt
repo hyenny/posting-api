@@ -5,16 +5,20 @@ import jakarta.persistence.Embeddable
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.PostLoad
+import jakarta.persistence.PostPersist
 import jakarta.persistence.Table
+import jakarta.persistence.Transient
 import java.time.LocalDateTime
 import java.util.UUID
+import org.springframework.data.domain.Persistable
 
 @Entity
 @Table(name = "posting")
 class PostingEntity(
     @Id
     @Column(name = "id", nullable = false, updatable = false)
-    val id: UUID,
+    private val id: UUID,
 
     @Embedded
     val author: AuthorEmbeddable,
@@ -26,20 +30,33 @@ class PostingEntity(
     val content: String,
 
     @Column(name = "view_count", nullable = false)
-    var viewCount: Int = 0,
+    val viewCount: Int,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime,
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime,
 
     @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null
-) {
+    val deletedAt: LocalDateTime?
+): Persistable<UUID> {
+
+    @Transient
+    private var _isNew: Boolean = true
+
+    override fun getId(): UUID = id
+
+    override fun isNew(): Boolean = _isNew
+
+    @PostPersist
+    @PostLoad
+    fun load() {
+        _isNew = false
+    }
 
     override fun toString(): String {
-        return "PostingEntity(id=$id, author='${author.authorName}' title='$title', createdAt=$createdAt, updatedAt=$updatedAt, deletedAt=$deletedAt)"
+        return "PostingEntity(id=$id, author='${author.name}' title='$title', createdAt=$createdAt, updatedAt=$updatedAt, deletedAt=$deletedAt)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -59,8 +76,8 @@ class PostingEntity(
 data class AuthorEmbeddable(
 
     @Column(name = "author_id", nullable = false, updatable = false)
-    val authorId: UUID,
+    val id: UUID,
 
     @Column(name = "author_name", nullable = false)
-    val authorName: String
+    val name: String
 )
