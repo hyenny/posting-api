@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class Posting private constructor(
-    val id: UUID,
+    val id: UUID?,
     val author: Author,
     var title: String,
     var content: String,
@@ -13,6 +13,12 @@ class Posting private constructor(
     var updatedAt: LocalDateTime,
     val deletedAt: LocalDateTime?,
 ) {
+
+    fun update(title: String, content: String) {
+        this.title = title
+        this.content = content
+        this.updatedAt = LocalDateTime.now()
+    }
 
     companion object {
         private operator fun invoke(
@@ -43,7 +49,7 @@ class Posting private constructor(
             content: String,
         ): Posting {
             return Posting(
-                id = UUID.randomUUID(),
+                id = null,
                 author = author,
                 title = title,
                 content = content,
@@ -55,7 +61,7 @@ class Posting private constructor(
         }
 
         fun of(
-            id: UUID,
+            id: UUID?,
             author: Author,
             title: String,
             content: String,

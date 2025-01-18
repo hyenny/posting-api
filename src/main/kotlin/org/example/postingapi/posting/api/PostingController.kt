@@ -7,6 +7,7 @@ import org.example.postingapi.posting.application.query.PostingQueryService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -21,6 +22,11 @@ class PostingController(
     @PostMapping
     fun create(@RequestBody request: CreatePostingRequest) {
         postingCommandService.createPosting(request.toCommand())
+    }
+
+    @PutMapping("/{id}")
+    fun update(@PathVariable id: UUID, @RequestBody request: UpdatePostingRequest) {
+        postingCommandService.updatePosting(request.toCommand(id))
     }
 
     @GetMapping("/{id}")

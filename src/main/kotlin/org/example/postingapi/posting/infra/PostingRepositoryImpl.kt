@@ -14,8 +14,8 @@ import org.springframework.stereotype.Repository
 class PostingRepositoryImpl(
     private val postingJpaRepository: PostingJpaRepository,
 ): PostingRepository {
-    override fun save(newPosting: Posting) {
-        postingJpaRepository.save(toEntity(newPosting))
+    override fun save(toPosting: Posting) {
+        postingJpaRepository.save(toEntity(toPosting))
     }
 
     override fun findById(id: UUID): Posting? {

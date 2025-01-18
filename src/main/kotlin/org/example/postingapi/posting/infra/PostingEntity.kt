@@ -5,20 +5,18 @@ import jakarta.persistence.Embeddable
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
-import jakarta.persistence.PostLoad
-import jakarta.persistence.PostPersist
 import jakarta.persistence.Table
-import jakarta.persistence.Transient
 import java.time.LocalDateTime
 import java.util.UUID
-import org.springframework.data.domain.Persistable
+import org.hibernate.annotations.UuidGenerator
 
 @Entity
 @Table(name = "posting")
 class PostingEntity(
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private val id: UUID,
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @Column(name = "id", columnDefinition = "BINARY(16)", nullable = false, updatable = false)
+    var id: UUID? = null,
 
     @Embedded
     val author: AuthorEmbeddable,
@@ -39,22 +37,8 @@ class PostingEntity(
     val updatedAt: LocalDateTime,
 
     @Column(name = "deleted_at")
-    val deletedAt: LocalDateTime?
-): Persistable<UUID> {
-
-    @Transient
-    private var _isNew: Boolean = true
-
-    override fun getId(): UUID = id
-
-    override fun isNew(): Boolean = _isNew
-
-    @PostPersist
-    @PostLoad
-    fun load() {
-        _isNew = false
-    }
-
+    val deletedAt: LocalDateTime?,
+) {
     override fun toString(): String {
         return "PostingEntity(id=$id, author='${author.name}' title='$title', createdAt=$createdAt, updatedAt=$updatedAt, deletedAt=$deletedAt)"
     }
